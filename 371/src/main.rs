@@ -12,7 +12,8 @@ fn qcheck(solution: Vec<u32>) -> bool {
         return false;
     }
 
-    for (i, value) in solution.iter().enumerate() {
+    // Only need to do this for the first half of the values as doing it for the second half would be duplicating work
+    for (i, value) in solution.iter().enumerate().take(solution.len() / 2) {
         // Produce the diagonal failure rows for the current index
         
         let mut up_diagonal_values = (0..i).enumerate().map(|(j, _x)| *value + (j as u32) + 1).rev().collect::<Vec<u32>>();
@@ -29,6 +30,7 @@ fn qcheck(solution: Vec<u32>) -> bool {
                 return false;
             }
         }
+        
     }
     true
 }
