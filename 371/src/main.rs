@@ -12,25 +12,22 @@ fn qcheck(solution: Vec<u32>) -> bool {
         return false;
     }
 
-    // Only need to do this for the first half of the values as doing it for the second half would be duplicating work
-    for (i, value) in solution.iter().enumerate().take(solution.len() / 2) {
-        // Produce the diagonal failure rows for the current index
-        
-        let mut up_diagonal_values = (0..i).enumerate().map(|(j, _x)| *value + (j as u32) + 1).rev().collect::<Vec<u32>>();
-        up_diagonal_values.push(*value); // the current value stays the same, but we add one plus the index from this point in both directions
-        up_diagonal_values.extend((i+1..solution.len()).enumerate().map(|(j, _x)| *value + (j as u32) + 1));
-
-        let mut down_diagonal_values = (0..i).enumerate().map(|(j, _x)| value.checked_sub(j as u32).and_then(|v| v.checked_sub(1)) ).rev().collect::<Vec<Option<u32>>>();
-        down_diagonal_values.push(Option::from(*value)); // the current value stays the same, but we subtract one minus the index from this point in both directions
-        down_diagonal_values.extend((i+1..solution.len()).enumerate().map(|(j, _x)| value.checked_sub(j as u32).and_then(|v| v.checked_sub(1))));
-
+    // Only need to do this for the first half of the values as doing it for the second half would be comparing each set of numbers twice
+    for (i, actual_value) in solution.iter().enumerate().take(solution.len() / 2) {
         // Check that for the solution no index matches it's counterpart in either failure row
-        for (j, val) in solution.iter().enumerate() {
-            if j != i && (*val == up_diagonal_values[j] || (down_diagonal_values[j].is_some() && *val == down_diagonal_values[j].unwrap())) {
+        for (j, comparison_value) in solution.iter().enumerate() {
+            if i == j {
+                continue;
+            }
+
+            let difference = (i as i32 - j as i32).abs() as u32;
+            let diagonal_inc = *comparison_value + difference;
+            let diagonal_dec = comparison_value.checked_sub(difference);
+            
+            if *actual_value == diagonal_inc || (diagonal_dec.is_some() && *actual_value == diagonal_dec.unwrap()) {
                 return false;
             }
         }
-        
     }
     true
 }
